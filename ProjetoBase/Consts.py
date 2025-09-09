@@ -22,10 +22,14 @@ class Consts:
     EQ        = '='
     ARROW     = '->'
     COMMA     = ','
+    COLON     = ':'       
+    DOT       = '.'       
     LPAR      = '('
     RPAR      = ')'
     LSQUARE   = '['
     RSQUARE   = ']'
+    LBRACE    = '{'       
+    RBRACE    = '}'       
 
     EOF       = '$EOF'
 
@@ -36,6 +40,9 @@ class Consts:
     FOR       = 'for'
     FUNC      = 'fn'
     RETURN    = 'return'
+    TO     = 'to'       # NEW
+    DO     = 'do'       # NEW
+    STEP   = 'step'
 
     KEYS = [
         LET,
@@ -43,5 +50,8 @@ class Consts:
         WHILE,
         FOR,
         FUNC,
-        RETURN
+        RETURN,
+        TO,
+        DO,
+        STEP
     ]

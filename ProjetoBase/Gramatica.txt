@@ -1,19 +1,19 @@
-
 <Exp> ::= <LetAssign> | <Assign> | <Sum>
 
 <LetAssign> ::= LET ID EQ <Exp>
-<Assign>    ::= ID EQ <Exp>          
+<Assign>    ::= ID  EQ <Exp>
 
 <Sum>     ::= <Product> ((PLUS | MINUS) <Product>)*
 <Product> ::= <Unary>   ((MUL  | DIV  ) <Unary  >)*
-
-<Unary> ::= (PLUS | MINUS)* <Pow>
+<Unary>   ::= (PLUS | MINUS)* <Pow>
 
 <Pow> ::= <Primary> (POW <Unary>)?
 
-<Primary>     ::= <Atom> <CallSuffix>*
-<CallSuffix>  ::= LPAR [<ArgList>] RPAR
-<ArgList>     ::= <Exp> (COMMA <Exp>)*
+<Primary>    ::= <Atom> <Suffix>*
+<Suffix>     ::= <CallSuffix> | <MemberSuffix>
+<CallSuffix> ::= LPAR [<ArgList>] RPAR
+<MemberSuffix> ::= DOT ID
+<ArgList>    ::= <Exp> (COMMA <Exp>)*
 
 <Atom> ::= INT
          | FLOAT
@@ -21,13 +21,17 @@
          | ID
          | <ListExp>
          | <TupleExp>
+         | <ObjectExp>
          | LPAR <Exp> RPAR
          | <FuncLiteral>
 
 <FuncLiteral> ::= FUNC LPAR [ID (COMMA ID)*] RPAR ARROW <Exp>
 
-<ListExp>  ::= LSQUARE [ <Exp> (COMMA <Exp>)* ] RSQUARE
-<TupleExp> ::= LPAR <Exp> (COMMA <Exp>)+ RPAR
+<ListExp>   ::= LSQUARE [ <Exp> (COMMA <Exp>)* ] RSQUARE
+<TupleExp>  ::= LPAR <Exp> (COMMA <Exp>)+ RPAR
+<ObjectExp> ::= LBRACE [ <ObjPair> (COMMA <ObjPair>)* ] RBRACE
+<ObjPair>   ::= (ID | STRING) COLON <Exp>
+
 
 
 
@@ -38,7 +42,13 @@ MINUS é o -
 POW é o ^
 LPAR é o (
 RPAR é o )
+LSQUARE é o [ 
+RSQUARE é o ]
+LBRACE é o { 
+RBRACE é o }
 COMMA é ,
+COLON é : 
+DOT é .
 INT é um inteiro qualquer
 FLOAT é um float qualquer
 ID é qualquer identificador
