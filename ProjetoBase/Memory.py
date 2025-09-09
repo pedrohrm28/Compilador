@@ -1,42 +1,27 @@
-from Consts import Consts
-from SemanticVisitor import TNumber
 from Error import Error
 
 ####################################### Tabela de simbolos (Symbol Table) #######################################
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
-
     def get(self, name):
         return self.symbols.get(name, None)
-
     def set(self, name, value):
         self.symbols[name] = value
-
     def remove(self, name):
-        del self.symbols[name]
-
+        if name in self.symbols:
+            del self.symbols[name]
 
 ####################################### Gerente de Memoria #######################################
 class MemoryManager:
     singleton = None
 
     def __init__(self):
-        if MemoryManager.singleton is not None:
-            raise Exception(f"{Error.singletonMsg(self)}.instanceOfMemoryManager(resetErrors=True)'!")
+        self.tables = [SymbolTable()]   # escopo global
         self.value = None
         self.error = None
-        MemoryManager.singleton = self
-        self.configSymbolTable()
 
-    def configSymbolTable(self):
-        # escopo global
-        self.symbolTable = SymbolTable()
-        self.symbolTable.set(Consts.NULL, TNumber(0))  # 'null' -> 0
-        # pilha de escopos: [global]
-        self.tables = [self.symbolTable]
-
-    # ---------- Escopos ----------
+    # --- API de escopo ---
     def push_scope(self, closure=None):
         tbl = SymbolTable()
         if closure:
@@ -44,16 +29,21 @@ class MemoryManager:
         self.tables.append(tbl)
 
     def pop_scope(self):
-        if len(self.tables) > 1:
-            self.tables.pop()
-        else:
+        if len(self.tables) <= 1:
             self.fail(Error("Pop de escopo global"))
+            return
+        self.tables.pop()
 
     def snapshot_env(self):
         # snapshot raso do topo atual
         return self.tables[-1].symbols.copy()
 
-    # ---------- Símbolos ----------
+    # Alias para compatibilidade com codigo existente
+    @property
+    def symbolTable(self):
+        return self.tables[-1]
+
+    # --- API de simbolos ---
     def get(self, name):
         for tbl in reversed(self.tables):
             v = tbl.get(name)
@@ -64,11 +54,18 @@ class MemoryManager:
     def set(self, name, value):
         self.tables[-1].set(name, value)
 
-    # ---------- Protocolo de execução ----------
-    def registry(self, rtr):
-        if rtr.error:
-            self.error = rtr.error
-        return rtr.value
+    # --- protocolo de execucao/erros ---
+    def registry(self, manager_or_value):
+        # aceita MemoryManager retornado de visitas aninhadas OU valor direto
+        if isinstance(manager_or_value, MemoryManager):
+            if manager_or_value.error:
+                self.error = manager_or_value.error
+                return None
+            self.value = manager_or_value.value
+            return self.value
+        else:
+            self.value = manager_or_value
+            return self.value
 
     def success(self, value):
         self.value = value
@@ -78,11 +75,13 @@ class MemoryManager:
         self.error = error
         return self
 
-    @staticmethod
+    @staticmethod    
     def resetSingletonError():
+        if MemoryManager.singleton is None:
+            MemoryManager.singleton = MemoryManager()
         MemoryManager.singleton.error = None
         return MemoryManager.singleton
-
+    
     @staticmethod
     def instanceOfMemoryManager(resetErrors=True):
         if MemoryManager.singleton is None:

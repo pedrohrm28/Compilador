@@ -13,7 +13,7 @@ class Repl(Cmd):
     def help_exit(self):
         print('Digite\n :q para sair\n :s para um exemplo!')
         return False
-    def emptyline(self): # Disabilita repeticao do ultimo comando
+    def emptyline(self): 
         pass
     def do_s(self):
         print("Samples:")
@@ -32,7 +32,6 @@ class Repl(Cmd):
     help_EOF = help_exit
 
     def run(self, linha):
-        # Gerar tokens
         lexer = Lexer(linha)
         tokens, error = lexer.makeTokens()
         if error: 
@@ -40,7 +39,6 @@ class Repl(Cmd):
             return None, error
         print(f'Lexer: {tokens}')
 
-        # Gerar AST
         parser = Parser.instance()
         astInfo = parser.Parsing(tokens)
         semanticNode, error = astInfo.node, astInfo.error
@@ -49,16 +47,19 @@ class Repl(Cmd):
             return None, error
         print(f'Parser: {semanticNode}')
 
-        ##############################
-        # Semantica de tipos para tratar valores na AST (Abstract Syntax Tree), bem como RunTime ou Geracao de Codigo
         generate = CodeGEN()
-        managerRT = generate.run(semanticNode) # Aqui chamamos o visit do node da AST, passando o operador de memoria
+        managerRT = generate.run(semanticNode) 
         return managerRT.value, managerRT.error
 
-        ############################## return semanticNode, error
     
     def analisador(self, linha):
         resultado, error = self.run(linha)
         if error: 
             print(f'Log de Erro: {error}')
         else: print(f'{resultado}')
+
+    def do_let(self, arg):
+        return self.default("let " + arg)
+
+    def do_fn(self, arg):
+        return self.default("fn " + arg)

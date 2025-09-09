@@ -5,38 +5,38 @@ class Consts:
     LETRAS = string.ascii_letters
     LETRAS_DIGITOS = DIGITOS + LETRAS
     UNDER = '_'
+
+    # Token types
     INT       = 'INT'
     FLOAT     = 'FLOAT'
+    STRING    = 'STRING'
+    ID        = 'ID'
+    KEY       = 'KEY'
+
     PLUS      = '+'
     MINUS     = '-'
     MUL       = '*'
     DIV       = '/'
+    POW       = '^'
+
+    EQ        = '='
+    ARROW     = '->'
+    COMMA     = ','
     LPAR      = '('
     RPAR      = ')'
+    LSQUARE   = '['
+    RSQUARE   = ']'
+
     EOF       = '$EOF'
-    EQ        = '='
-    POW       = '^'
-    ID	      = 'ID'
-    KEY		  = 'KEY'
-    NULL      = 'null'
-    STRING    = "STRING"
-    GRAPH     = '@'
-    LSQUARE   = "[" # Left  Box brackets [
-    RSQUARE   = "]" # Right Box brackets ]
-    COMMA      = ","
-    LBRACE = '{'
-    RBRACE = '}'
-    COLON = ':'
 
-
-
-    # Exemplos de Palavras reservadas
-    FUNC      = 'fn'         
+    # Palavras reservadas
+    LET       = 'let'
+    IF        = 'if'
+    WHILE     = 'while'
+    FOR       = 'for'
+    FUNC      = 'fn'
     RETURN    = 'return'
-    LET         = 'let'
-    IF          = 'if'
-    WHILE       = 'while'
-    FOR         = 'for'
+
     KEYS = [
         LET,
         IF,
@@ -45,4 +45,3 @@ class Consts:
         FUNC,
         RETURN
     ]
-

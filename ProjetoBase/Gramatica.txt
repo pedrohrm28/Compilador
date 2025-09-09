@@ -1,13 +1,34 @@
-<Exp> ::= <Term> ((MINUS | PLUS) <Term>)*
-<Exp> ::= [LET] ID EQ <Exp>
-<Term> ::= <Factor> ((MUL | DIV) <Factor>)*
-<Factor> ::= (PLUS | MINUS)* <Factor>
-<Factor> ::= <Pow>
-<Pow> ::= <Atom> (<Pow> <Factor>)*
-<Atom> ::= INT | FLOAT | STRING | ID | <ListExp> | LPAR <Exp> RPAR
-<ListExp> ::= LSQUARE [ <Exp> (COMMA <Exp>)* ] RSQUARE
-<Atom> ::= INT | FLOAT | STRING | ID | <ListExp> | <TupleExp> | LPAR <Exp> RPAR
+
+<Exp> ::= <LetAssign> | <Assign> | <Sum>
+
+<LetAssign> ::= LET ID EQ <Exp>
+<Assign>    ::= ID EQ <Exp>          
+
+<Sum>     ::= <Product> ((PLUS | MINUS) <Product>)*
+<Product> ::= <Unary>   ((MUL  | DIV  ) <Unary  >)*
+
+<Unary> ::= (PLUS | MINUS)* <Pow>
+
+<Pow> ::= <Primary> (POW <Unary>)?
+
+<Primary>     ::= <Atom> <CallSuffix>*
+<CallSuffix>  ::= LPAR [<ArgList>] RPAR
+<ArgList>     ::= <Exp> (COMMA <Exp>)*
+
+<Atom> ::= INT
+         | FLOAT
+         | STRING
+         | ID
+         | <ListExp>
+         | <TupleExp>
+         | LPAR <Exp> RPAR
+         | <FuncLiteral>
+
+<FuncLiteral> ::= FUNC LPAR [ID (COMMA ID)*] RPAR ARROW <Exp>
+
+<ListExp>  ::= LSQUARE [ <Exp> (COMMA <Exp>)* ] RSQUARE
 <TupleExp> ::= LPAR <Exp> (COMMA <Exp>)+ RPAR
+
 
 
 PLUS é o +
@@ -17,8 +38,11 @@ MINUS é o -
 POW é o ^
 LPAR é o (
 RPAR é o )
+COMMA é ,
 INT é um inteiro qualquer
 FLOAT é um float qualquer
 ID é qualquer identificador
 LET é a palavra reservada let
 STRING algo entre aspas
+FUNC é a palavra reservada fn
+ARROW é ->
