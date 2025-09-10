@@ -169,3 +169,52 @@ class NoCall(Visitor):
         operator.pop_scope()
         return operator.success(result)
     def __repr__(self): return f"call({self.calleeNode}, {self.argNodes})"
+
+
+class NoForComp(Visitor):
+    def __init__(self, varTok, startNode, endNode, stepNode, bodyNode):
+        self.varTok   = varTok
+        self.start    = startNode
+        self.end      = endNode
+        self.stepNode = stepNode
+        self.body     = bodyNode
+
+    def visit(self, operator):
+        s = operator.registry(self.start.visit(operator))
+        if operator.error: return operator
+        e = operator.registry(self.end.visit(operator))
+        if operator.error: return operator
+        if not isinstance(s, TNumber) or not isinstance(e, TNumber):
+            return operator.fail(Error("for: 'start' e 'end' devem ser numeros"))
+
+        if self.stepNode is not None:
+            st = operator.registry(self.stepNode.visit(operator))
+            if operator.error: return operator
+            if not isinstance(st, TNumber):
+                return operator.fail(Error("for: 'step' deve ser numero"))
+            step = int(st.value)
+        else:
+            step = 1 if s.value <= e.value else -1
+
+        if step == 0:
+            return operator.fail(Error("for: step nao pode ser 0"))
+
+        out = []
+        operator.push_scope()
+        i = int(s.value)
+        end_val = int(e.value)
+
+        def comp(a, b):
+            return a <= b if step > 0 else a >= b
+
+        while comp(i, end_val):
+            operator.set(self.varTok.value, TNumber(i).setMemory(operator))
+            v = operator.registry(self.body.visit(operator))
+            if operator.error:
+                operator.pop_scope()
+                return operator
+            out.append(v)
+            i += step
+
+        operator.pop_scope()
+        return operator.success(TList(out).setMemory(operator))

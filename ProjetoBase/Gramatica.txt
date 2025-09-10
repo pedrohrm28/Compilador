@@ -24,6 +24,7 @@
          | <ObjectExp>
          | LPAR <Exp> RPAR
          | <FuncLiteral>
+         | <ForComp>
 
 <FuncLiteral> ::= FUNC LPAR [ID (COMMA ID)*] RPAR ARROW <Exp>
 
@@ -31,6 +32,7 @@
 <TupleExp>  ::= LPAR <Exp> (COMMA <Exp>)+ RPAR
 <ObjectExp> ::= LBRACE [ <ObjPair> (COMMA <ObjPair>)* ] RBRACE
 <ObjPair>   ::= (ID | STRING) COLON <Exp>
+<ForComp> ::= FOR ID EQ <Exp> TO <Exp> [STEP <Exp>] DO <Exp>
 
 
 
@@ -56,3 +58,6 @@ LET é a palavra reservada let
 STRING algo entre aspas
 FUNC é a palavra reservada fn
 ARROW é ->
+TO é a palavra reservada 'to'
+DO é a palavra reservada 'do'
+STEP é a palavra reservada 'step'

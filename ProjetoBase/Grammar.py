@@ -200,6 +200,50 @@ class Atom(Grammar):
             self.NextToken(); return ast.success(NoString(tok))
         if tok.type == Consts.ID:
             self.NextToken(); return ast.success(NoVarAccess(tok))
+        
+        #Laços
+        if tok.matches(Consts.KEY, Consts.FOR):
+            self.NextToken()
+
+            if self.CurrentToken().type != Consts.ID:
+                return ast.fail("Esperado identificador apos 'for'")
+            iterTok = self.CurrentToken()
+            self.NextToken()
+
+            if self.CurrentToken().type != Consts.EQ:
+                return ast.fail("Esperado '=' apos identificador do for")
+            self.NextToken()  # '='
+
+            startNode = ast.registry(Exp(self.parser).Rule())
+            if ast.error: return ast
+
+            # 'to'
+            if not (self.CurrentToken().matches(Consts.KEY, Consts.TO) or
+                    (self.CurrentToken().type == Consts.ID and self.CurrentToken().value == Consts.TO)):
+                return ast.fail("Esperado 'to' no for")
+            self.NextToken()
+
+            endNode = ast.registry(Exp(self.parser).Rule())
+            if ast.error: return ast
+
+            # [step <Exp>]
+            stepNode = None
+            if (self.CurrentToken().matches(Consts.KEY, Consts.STEP) or
+                (self.CurrentToken().type == Consts.ID and self.CurrentToken().value == Consts.STEP)):
+                self.NextToken()
+                stepNode = ast.registry(Exp(self.parser).Rule())
+                if ast.error: return ast
+
+            # 'do'
+            if not (self.CurrentToken().matches(Consts.KEY, Consts.DO) or
+                    (self.CurrentToken().type == Consts.ID and self.CurrentToken().value == Consts.DO)):
+                return ast.fail("Esperado 'do' no for")
+            self.NextToken()
+
+            bodyNode = ast.registry(Exp(self.parser).Rule())
+            if ast.error: return ast
+
+            return ast.success(NoForComp(iterTok, startNode, endNode, stepNode, bodyNode))
 
         return ast.fail(f"{Error.parserError}: Token inesperado em Atom: {tok}")
 
